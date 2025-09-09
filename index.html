@@ -1,353 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Vrcal — Pro Link Player with Language Dubbing</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{max-width:980px;margin:18px auto;padding:18px;display:flex;flex-direction:column;gap:12px}
-    header{display:flex;gap:8px;align-items:center}
-    input,button,select,textarea{font-size:15px;padding:8px;border:1px solid #ddd;border-radius:8px}
-    textarea{width:100%;height:90px;resize:vertical}
-    .controls{display:flex;gap:12px;flex-wrap:wrap}
-    video{width:100%;height:auto;background:#000;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08)}
-    .row{display:flex;gap:8px;align-items:center}
-    .list{display:flex;flex-direction:column;gap:6px}
-    .item{padding:8px;border-radius:8px;background:#f6f7fb;cursor:pointer;word-break:break-all}
-    footer{font-size:13px;color:#666}
-    .small{font-size:13px;color:#444}
-    .panel{background:#fff;border:1px solid #eee;padding:12px;border-radius:10px}
-    .grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
-    @media(max-width:820px){.grid{grid-template-columns:1fr}}
-    label{display:flex;align-items:center;gap:8px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vrcal — Pro Link Player with Audio Track Detection</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+body{max-width:980px;margin:18px auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;gap:8px;align-items:center}
+input,button,select,textarea{font-size:15px;padding:8px;border:1px solid #ddd;border-radius:8px}
+textarea{width:100%;height:90px;resize:vertical}
+.controls{display:flex;gap:12px;flex-wrap:wrap}
+video{width:100%;height:auto;background:#000;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08)}
+.row{display:flex;gap:8px;align-items:center}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{padding:8px;border-radius:8px;background:#f6f7fb;cursor:pointer;word-break:break-all}
+footer{font-size:13px;color:#666}
+.small{font-size:13px;color:#444}
+.panel{background:#fff;border:1px solid #eee;padding:12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+label{display:flex;align-items:center;gap:8px}
+.error{color:#b00020}
+</style>
 </head>
 <body>
-  <header>
-    <input id="singleInput" placeholder="Enter your link(s) — one per line" style="flex:1">
-    <button id="loadBtn">Load</button>
-  </header>
+<header>
+<input id="singleInput" placeholder="Enter your link(s) — one per line" style="flex:1">
+<button id="loadBtn">Load</button>
+</header>
 
-  <div class="controls grid">
-    <div class="panel">
-      <textarea id="multiInput" placeholder="Or paste multiple video links here, one per line"></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <button id="clearPlaylist">Clear</button>
-        <button id="savePreset">Save Preset</button>
-        <select id="presets"></select>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <label class="small">Volume <input id="vol" type="range" min="0" max="1" step="0.01" value="1" style="width:160px"></label>
-        <label class="small"><input id="autonext" type="checkbox"> Auto next</label>
-      </div>
-      <div style="margin-top:12px">
-        <div class="small">Keyboard: Space play/pause · N next · P prev</div>
-      </div>
-    </div>
 
-    <div class="panel">
-      <div class="row">
-        <input id="dubbUrl" placeholder="Dubbing audio URL (mp3)" style="flex:1">
-        <select id="dubbLang">
-          <option value="en">English</option>
-          <option value="hi">Hindi</option>
-          <option value="bn">Bangla</option>
-          <option value="ar">Arabic</option>
-          <option value="es">Spanish</option>
-          <option value="other">Other</option>
-        </select>
-        <button id="addDubb">Add</button>
-      </div>
-      <div style="margin-top:8px">
-        <select id="langSelect" style="width:100%"></select>
-      </div>
-      <div style="margin-top:10px" class="small">Dubbing list</div>
-      <div id="dubbList" class="list" style="max-height:240px;overflow:auto;margin-top:6px"></div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button id="preloadSelected">Preload Selected</button>
-        <button id="removeSelected">Remove Selected</button>
-      </div>
-    </div>
-  </div>
+<div class="controls grid">
+<div class="panel">
+<textarea id="multiInput" placeholder="Or paste multiple video links here, one per line"></textarea>
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+<button id="clearPlaylist">Clear</button>
+<button id="savePreset">Save Preset</button>
+<select id="presets"></select>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+<label class="small">Volume <input id="vol" type="range" min="0" max="1" step="0.01" value="1" style="width:160px"></label>
+<label class="small"><input id="autonext" type="checkbox"> Auto next</label>
+</div>
+<div style="margin-top:12px">
+<div class="small">Keyboard: Space play/pause · N next · P prev</div>
+</div>
+</div>
 
-  <video id="video" controls crossorigin playsinline></video>
 
-  <div style="display:flex;gap:12px;align-items:flex-start">
-    <div style="flex:1">
-      <div class="small">Playlist</div>
-      <div id="playlist" class="list" style="max-height:240px;overflow:auto"></div>
-    </div>
-    <div style="width:260px">
-      <div class="small">Active dubbing</div>
-      <div id="activeInfo" class="panel small" style="min-height:72px"></div>
-    </div>
-  </div>
-
-  <footer>Pro features: language switcher, preload, local presets, keyboard shortcuts, better sync. Deploy as single file on Vercel.</footer>
-
-  <script>
-    const video = document.getElementById('video')
-    const singleInput = document.getElementById('singleInput')
-    const multiInput = document.getElementById('multiInput')
-    const loadBtn = document.getElementById('loadBtn')
-    const playlistEl = document.getElementById('playlist')
-    const dubbUrl = document.getElementById('dubbUrl')
-    const addDubb = document.getElementById('addDubb')
-    const dubbLang = document.getElementById('dubbLang')
-    const dubbList = document.getElementById('dubbList')
-    const langSelect = document.getElementById('langSelect')
-    const activeInfo = document.getElementById('activeInfo')
-    const preloadSelected = document.getElementById('preloadSelected')
-    const removeSelected = document.getElementById('removeSelected')
-    const vol = document.getElementById('vol')
-    const autonext = document.getElementById('autonext')
-    const clearPlaylist = document.getElementById('clearPlaylist')
-    const savePreset = document.getElementById('savePreset')
-    const presets = document.getElementById('presets')
-    let playlist = []
-    let currentIndex = -1
-    let dubbings = []
-    const audio = new Audio()
-    audio.crossOrigin = 'anonymous'
-    audio.preload = 'none'
-    let activeLang = 'original'
-
-    function savePresetsToStorage(){
-      const data = {playlist,dubbings}
-      localStorage.setItem('vrcal_preset',JSON.stringify(data))
-    }
-    function loadPresetsFromStorage(){
-      try{
-        const raw = localStorage.getItem('vrcal_preset')
-        if(!raw) return
-        const data = JSON.parse(raw)
-        playlist = data.playlist || []
-        dubbings = data.dubbings || []
-        renderPlaylist()
-        renderDubbings()
-      }catch(e){}
-    }
-
-    function renderPlaylist(){
-      playlistEl.innerHTML = ''
-      playlist.forEach((u,i)=>{
-        const el = document.createElement('div')
-        el.className = 'item'
-        el.textContent = (i+1)+'. '+u
-        el.onclick = ()=>{loadIndex(i)}
-        playlistEl.appendChild(el)
-      })
-    }
-
-    function renderDubbings(){
-      dubbList.innerHTML = ''
-      const langs = new Map()
-      const defaultOpt = document.createElement('option')
-      defaultOpt.value = 'original'
-      defaultOpt.textContent = 'Original audio'
-      langSelect.innerHTML = ''
-      langSelect.appendChild(defaultOpt)
-      dubbings.forEach((d,i)=>{
-        const el = document.createElement('div')
-        el.className = 'item'
-        el.textContent = '['+d.lang+'] '+(d.name||d.url)
-        el.dataset.index = i
-        el.onclick = ()=>{selectDubbing(i)}
-        dubbList.appendChild(el)
-        if(!langs.has(d.lang))langs.set(d.lang,[])
-        langs.get(d.lang).push({i,d})
-      })
-      langs.forEach((arr,lang)=>{
-        const o = document.createElement('option')
-        o.value = lang
-        o.textContent = lang+' ('+arr.length+')'
-        langSelect.appendChild(o)
-      })
-    }
-
-    function selectDubbing(idx){
-      const d = dubbings[idx]
-      if(!d) return
-      activeLang = 'd'+idx
-      audio.src = d.url
-      audio.currentTime = Math.max(0,video.currentTime)
-      audio.volume = Number(vol.value)
-      video.muted = true
-      audio.play().catch(()=>{})
-      updateActiveInfo()
-    }
-
-    function updateActiveInfo(){
-      if(activeLang==='original'){
-        activeInfo.textContent = 'Using original audio'
-        video.muted = false
-        audio.pause()
-        audio.src = ''
-        return
-      }
-      const idx = parseInt(activeLang.slice(1))
-      const d = dubbings[idx]
-      if(!d){activeInfo.textContent='Selected dubbing not found';return}
-      activeInfo.innerHTML = 'Language: '+d.lang+'<br>'+(d.name||d.url)
-    }
-
-    function loadIndex(i){
-      if(i<0||i>=playlist.length) return
-      currentIndex = i
-      video.src = playlist[i]
-      video.load()
-      video.play().catch(()=>{})
-      if(activeLang.startsWith('d')){
-        try{audio.currentTime = 0}catch(e){}
-      }
-    }
-
-    loadBtn.addEventListener('click',()=>{
-      const s = singleInput.value.trim()
-      const m = multiInput.value.trim()
-      let urls = []
-      if(s) urls = urls.concat(s.split(/
-?
-/).map(x=>x.trim()).filter(Boolean))
-      if(m) urls = urls.concat(m.split(/
-?
-/).map(x=>x.trim()).filter(Boolean))
-      if(urls.length===0) return
-      playlist = urls
-      renderPlaylist()
-      loadIndex(0)
-    })
-
-    addDubb.addEventListener('click',()=>{
-      const u = dubbUrl.value.trim()
-      const lang = dubbLang.value || 'other'
-      if(!u) return
-      dubbings.push({url:u,lang,name:u.split('/').pop()})
-      dubbUrl.value=''
-      renderDubbings()
-    })
-
-    langSelect.addEventListener('change',()=>{
-      const v = langSelect.value
-      if(v==='original'){
-        activeLang='original'
-        updateActiveInfo()
-        return
-      }
-      const candidates = dubbings.map((d,i)=>({d,i})).filter(x=>x.d.lang===v)
-      if(candidates.length>0){
-        selectDubbing(candidates[0].i)
-      }
-    })
-
-    video.addEventListener('play',()=>{
-      if(audio.src) audio.play().catch(()=>{})
-    })
-    video.addEventListener('pause',()=>{
-      if(audio.src) audio.pause()
-    })
-    video.addEventListener('seeked',()=>{
-      if(audio.src){
-        try{audio.currentTime = video.currentTime}catch(e){}
-      }
-    })
-    video.addEventListener('timeupdate',()=>{
-      if(audio.src){
-        const a = audio.currentTime
-        const v = video.currentTime
-        if(Math.abs(a - v) > 0.35){
-          try{audio.currentTime = v}catch(e){}
-        }
-      }
-    })
-    video.addEventListener('ended',()=>{
-      if(autonext.checked && currentIndex+1<playlist.length){
-        loadIndex(currentIndex+1)
-      } else if(audio.src){
-        audio.pause()
-      }
-    })
-
-    vol.addEventListener('input',()=>{
-      const val = Number(vol.value)
-      video.volume = val
-      audio.volume = val
-    })
-
-    preloadSelected.addEventListener('click',async ()=>{
-      const v = langSelect.value
-      if(v==='original') return
-      const candidates = dubbings.map((d,i)=>({d,i})).filter(x=>x.d.lang===v)
-      if(candidates.length===0) return
-      const d = candidates[0].d
-      try{
-        const resp = await fetch(d.url,{mode:'cors'})
-        const blob = await resp.blob()
-        const blobUrl = URL.createObjectURL(blob)
-        d._prefetched = blobUrl
-        if(activeLang==='d'+candidates[0].i){
-          audio.src = blobUrl
-          audio.play().catch(()=>{})
-        }
-        renderDubbings()
-      }catch(e){
-        alert('Preload failed. Check CORS or URL')
-      }
-    })
-
-    removeSelected.addEventListener('click',()=>{
-      const v = langSelect.value
-      if(v==='original') return
-      dubbings = dubbings.filter(d=>d.lang!==v)
-      if(activeLang!=='original'){
-        activeLang='original'
-        updateActiveInfo()
-      }
-      renderDubbings()
-    })
-
-    clearPlaylist.addEventListener('click',()=>{
-      playlist = []
-      renderPlaylist()
-      video.src = ''
-    })
-
-    savePreset.addEventListener('click',()=>{
-      savePresetsToStorage()
-      alert('Preset saved locally')
-    })
-
-    presets.addEventListener('change',()=>{
-      const v = presets.value
-      if(!v) return
-      try{
-        const raw = localStorage.getItem(v)
-        if(!raw) return
-        const data = JSON.parse(raw)
-        playlist = data.playlist||[]
-        dubbings = data.dubbings||[]
-        renderPlaylist()
-        renderDubbings()
-      }catch(e){}
-    })
-
-    document.addEventListener('keydown',(e)=>{
-      if(e.code==='Space'){
-        e.preventDefault()
-        if(video.paused) video.play().catch(()=>{})
-        else video.pause()
-      }
-      if(e.key==='n'||e.key==='N'){
-        if(currentIndex+1<playlist.length) loadIndex(currentIndex+1)
-      }
-      if(e.key==='p'||e.key==='P'){
-        if(currentIndex-1>=0) loadIndex(currentIndex-1)
-      }
-    })
-
-    loadPresetsFromStorage()
-    updateActiveInfo()
-  </script>
-</body>
-</html>
+<div class="panel">
+<div class="row">
+<input id="dubbUrl" placeholder="Dubbing audio URL (mp3)" style="flex:1">
+<select id="dubbLang">
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+<option value="bn">Bangla</option>
+<option value="ar">Arabic</option>
+<option value="es">Spanish</option>
+<option value="other">Other</option>
+</select>
